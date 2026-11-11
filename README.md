@@ -11,6 +11,10 @@ and no generated video in this project. Every frame is canvas primitives
 music and every sound effect are synthesised at runtime with the Web Audio API
 in `js/sfx.js`.
 
+## Watch it online
+
+**https://robbiejrdev.github.io/claude-natural-history/**
+
 ## How to watch it
 
 Open **`index.html`** in a browser and press the orange button. That's it —
