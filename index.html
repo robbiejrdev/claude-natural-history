@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude: A Natural History</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100%; background: #0d0c0b; color: #f6efe4;
+    font-family: "Trebuchet MS", "Segoe UI", system-ui, -apple-system, sans-serif;
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
+  }
+  #stage {
+    position: relative;
+    width: min(100vw, calc(100vh * 16 / 9));
+    height: min(calc(100vw * 9 / 16), 100vh);
+    background: #000; overflow: hidden;
+    box-shadow: 0 0 60px rgba(0,0,0,.7);
+  }
+  canvas { width: 100%; height: 100%; display: block; }
+
+  /* ---------------- play overlay ---------------- */
+  #overlay {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 1.2vh;
+    background: radial-gradient(120% 90% at 50% 40%, #fdfaf3 0%, #f0e6d6 55%, #e2d3bd 100%);
+    transition: opacity .55s ease; z-index: 5;
+  }
+  #overlay.gone { opacity: 0; pointer-events: none; }
+  #overlay h1 {
+    margin: 0; font-size: clamp(26px, 5.4vw, 78px); letter-spacing: .06em;
+    color: #1a1210; text-transform: uppercase; font-weight: 800;
+    text-align: center; line-height: 1.05;
+  }
+  #overlay h1 small { display:block; font-size: .36em; letter-spacing: .34em; color: #a2543a; margin-top: .7em; }
+  #overlay p.sub { margin: 0; color: #6a5548; font-size: clamp(12px, 1.5vw, 20px); letter-spacing: .12em; text-transform: uppercase; }
+  #play {
+    margin-top: 2vh; width: clamp(74px, 9vw, 128px); height: clamp(74px, 9vw, 128px);
+    border-radius: 50%; border: 4px solid #1a1210; background: #fdfaf3; color: #1a1210;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    box-shadow: 0 8px 0 #1a1210; transition: transform .12s ease, box-shadow .12s ease;
+  }
+  #play:hover { transform: translateY(-3px); box-shadow: 0 11px 0 #1a1210; }
+  #play:active { transform: translateY(4px); box-shadow: 0 3px 0 #1a1210; }
+  #play svg { display: block; }
+  #overlay .hint { color: #8a7364; font-size: clamp(11px, 1.25vw, 16px); letter-spacing: .1em; }
+
+  /* ---------------- title / end cards ---------------- */
+  #titlecard, #endcard {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; pointer-events: none;
+    opacity: 0; transition: opacity .5s ease; z-index: 4; text-align: center;
+  }
+  #titlecard { color: #fdfaf3; text-shadow: 0 4px 18px rgba(0,0,0,.65); }
+  #titlecard .big { font-size: clamp(24px, 4.6vw, 66px); letter-spacing: .12em; font-weight: 800; text-transform: uppercase; }
+  #titlecard .small { font-size: clamp(12px, 1.5vw, 21px); letter-spacing: .3em; margin-top: .8em; color: #f0c9a8; text-transform: uppercase; }
+  #endcard { color: #fdfaf3; background: radial-gradient(70% 60% at 50% 45%, rgba(12,10,9,.78), rgba(12,10,9,.42) 70%, rgba(12,10,9,.2)); backdrop-filter: blur(3px); }
+  #endcard .big { font-size: clamp(22px, 4.2vw, 58px); letter-spacing: .1em; font-weight: 800; text-transform: uppercase; text-shadow: 0 4px 18px rgba(0,0,0,.7); }
+  #endcard .small { font-size: clamp(12px, 1.6vw, 22px); letter-spacing: .2em; margin-top: .7em; color: #f0c9a8; }
+  #replay {
+    margin-top: 2.4vh; padding: .7em 1.6em; font: inherit; font-weight: 800; letter-spacing: .12em;
+    text-transform: uppercase; border: 3px solid #fdfaf3; background: #d97757; color: #1a1210;
+    cursor: pointer; border-radius: 4px;
+  }
+  #replay:hover { background: #e89270; }
+
+  /* ---------------- subtitles ---------------- */
+  #subs {
+    position: absolute; left: 4%; right: 4%; bottom: 7.5%; z-index: 3;
+    text-align: center; font-size: clamp(15px, 2.5vw, 42px); font-weight: 800;
+    line-height: 1.22; color: #fff8ee; opacity: 0; transition: opacity .18s ease;
+    text-shadow: 0 3px 0 rgba(0,0,0,.75), 0 0 22px rgba(0,0,0,.8), 0 0 60px rgba(0,0,0,.6);
+    pointer-events: none;
+  }
+  #subs.on { opacity: 1; }
+  #subs .who {
+    display: inline-block; font-size: .52em; letter-spacing: .16em; vertical-align: middle;
+    margin-right: .6em; padding: .18em .55em; border-radius: 3px; background: #d97757; color: #1a1210;
+    text-shadow: none;
+  }
+  #subs .who.claude { background: #fdfaf3; }
+
+  /* ---------------- progress ---------------- */
+  #bar {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 6px; z-index: 4;
+    background: rgba(255,255,255,.14); cursor: pointer;
+  }
+  #fill { height: 100%; width: 0; background: #d97757; }
+  body.preview #subs, body.preview #bar, body.preview #overlay, body.preview #titlecard { display: none; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="c" width="1920" height="1080"></canvas>
+
+  <div id="titlecard">
+    <div class="big">Claude: A Natural History</div>
+    <div class="small">ten forms &middot; one flag &middot; no continuity</div>
+  </div>
+
+  <div id="overlay">
+    <p class="sub">Anthropic Pictures presents</p>
+    <h1>Claude<small>A Natural History</small></h1>
+    <button id="play" aria-label="Play"></button>
+    <p class="hint">sound on &middot; 84 seconds</p>
+  </div>
+
+  <div id="subs"></div>
+
+  <div id="endcard">
+    <div class="big">One flag. Ten forms.</div>
+    <div class="small">And a very tired rat.</div>
+    <button id="replay">Watch again</button>
+  </div>
+
+  <div id="bar"><div id="fill"></div></div>
+</div>
+
+<audio id="narration" preload="auto" src="audio/narration.mp3"></audio>
+
+<script src="js/util.js"></script>
+<script src="js/mascot.js"></script>
+<script src="js/world.js"></script>
+<script src="js/sfx.js"></script>
+<script src="js/story.js"></script>
+<script src="timeline.js"></script>
+<script src="js/player.js"></script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+Create a 60 to 90 second 2D cartoon on the evolution of the Claude mascot, drawn in code, with a narrator voiced by Fish Audio's Drama 3. I've attached an image of the mascot.
+
+
+The story, in this order:
+
+1. A tiny tadpole in the ocean
+
+2. It turns into a fish
+
+3. It crawls onto land as a lizard
+
+4. It gets massive and turns into a dinosaur
+
+5. An asteroid hits and wipes everything out
+
+6. A little rat climbs out of a hole
+
+7. The rat turns into a monkey
+
+8. The monkey stands up and becomes a human
+
+9. The human high-fives its mate
+
+10. The mate immediately turns straight back into a rat
+
+
+Visuals:
+
+- It must be clearly the Claude mascot at every stage.
+
+- Each stage has to morph into the next on screen, with no hard cuts to a new drawing.
+
+- Make it a flat 2D meme-style cartoon that fills a 16:9 frame.
+
+- Draw every frame in code. Don't use image generation, video generation or stock art.
+
+- The art must be original. Don't copy the style or characters of any existing show or film. The only existing character is the mascot.
+
+
+Narration:
+
+- The narrator sounds like a nature documentary that takes itself way too seriously, and the narration has to be funny.
+
+- Use the Fish Audio MCP to choose the voices from its voice library and to generate all speech, using the drama-3 model.
+
+- Keep the same narrator voice from start to finish.
+
+- Write the script yourself, with your own direction in square brackets on every line.
+
+- When the asteroid hits, the narrator's delivery has to change mid-sentence.
+
+- At least one character talks back to the narrator in its own voice.
+
+
+Timing and delivery:
+
+- Whatever the narrator is describing has to be on screen as they say it.
+
+- Add synced subtitles and a play button.
+
+- Any music or sound effects are optional, but they must be made in code.
+
+- Keep it family friendly.
+
+- Save the audio inside the project folder so that I can open index.html and press play.
+
+
+The jokes, the script and how each stage looks are all up to you. Make every creative decision yourself and don't ask me any questions, because you only get one shot at this.
+
+
+If you can't select drama-3 through the MCP, stop and tell me. Don't use a different model.
+
+
+When you're done, tell me which voices you picked, which model each speech call used, how many Fish Audio credits you spent, and anything from this prompt you couldn't do.
